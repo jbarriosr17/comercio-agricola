@@ -1,0 +1,10 @@
+services:
+  comercioagricola:
+    image: comercioagricola
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: ["sh", "-c", "pip install debugpy -t /tmp && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 -m uvicorn backend.app\main:app --host 0.0.0.0 --port 8085"]
+    ports:
+      - 8085:8085
+      - 5678:5678

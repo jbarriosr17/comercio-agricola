@@ -1,0 +1,6 @@
+projectKey=comercio
+serverUrl=http://localhost:9000
+serverVersion=25.10.0.114319
+dashboardUrl=http://localhost:9000/dashboard?id=comercio
+ceTaskId=daf75ded-4777-41f1-974d-bce0bfe729a6
+ceTaskUrl=http://localhost:9000/api/ce/task?id=daf75ded-4777-41f1-974d-bce0bfe729a6

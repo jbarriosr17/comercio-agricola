@@ -1,0 +1,74 @@
+{
+  "info": {
+    "name": "Comercio Agr\u00edcola",
+    "_postman_id": "c2e7f1b3-0000-4000-9000-000000000001",
+    "description": "Colecci\u00f3n de pruebas funcionales para la API del comercio agr\u00edcola.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', ()=> pm.response.code === 200);",
+              "pm.test('status ok', ()=> pm.response.json().status === 'ok');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Listar productos",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/v1/products"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', ()=> pm.response.code === 200);",
+              "pm.test('es un arreglo', ()=> Array.isArray(pm.response.json()));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Crear pedido (v\u00e1lido)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/v1/orders",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"customer_name\": \"QA Tester\", \"items\": [{\"product_id\": 1, \"quantity\": 1}]}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('crea 201', ()=> pm.response.code === 201);",
+              "pm.test('retorna id', ()=> 'id' in pm.response.json());"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

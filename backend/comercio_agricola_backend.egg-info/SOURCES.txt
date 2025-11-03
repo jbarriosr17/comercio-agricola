@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+app/__init__.py
+app/db.py
+app/main.py
+app/models.py
+app/schemas.py
+comercio_agricola_backend.egg-info/PKG-INFO
+comercio_agricola_backend.egg-info/SOURCES.txt
+comercio_agricola_backend.egg-info/dependency_links.txt
+comercio_agricola_backend.egg-info/top_level.txt
+tests/test_products.py

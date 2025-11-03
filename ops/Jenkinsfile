@@ -1,0 +1,78 @@
+
+pipeline {
+  agent any
+  environment {
+    // Configurar en Jenkins: SonarQube server (Manage Jenkins > System > SonarQube servers)
+    SONARQUBE_ENV = 'SonarQubeServer'
+    DOCKER_REGISTRY = credentials('docker-registry') // opcional
+  }
+  stages {
+    stage('Checkout') {
+      steps { checkout scm }
+    }
+    stage('Backend: Lint & Tests') {
+      steps {
+        dir('backend') {
+          sh 'python -m pip install --upgrade pip'
+          sh 'pip install -r requirements.txt'
+          sh 'flake8 .'
+          sh 'pytest -q --cov=app --cov-report=xml'
+        }
+      }
+      post { always { junit 'backend/.pytest_cache/**/results.xml' , allowEmptyResults: true } }
+    }
+    stage('Frontend: Build') {
+      steps {
+        dir('frontend') {
+          sh 'npm ci || npm install'
+          sh 'npm run build'
+        }
+      }
+    }
+    stage('SonarQube Analysis') {
+      steps {
+        withSonarQubeEnv("${SONARQUBE_ENV}") {
+          dir('backend') { sh 'sonar-scanner' }
+          dir('frontend') { sh 'sonar-scanner' }
+        }
+      }
+    }
+    stage('Quality Gate') {
+      steps {
+        timeout(time: 10, unit: 'MINUTES') {
+          script {
+            def qg = waitForQualityGate()
+            if (qg.status != 'OK') {
+              error "Quality Gate failed: ${qg.status}"
+            }
+          }
+        }
+      }
+    }
+    stage('Build Docker Images') {
+      steps {
+        script {
+          def tag = env.GIT_COMMIT.take(7)
+          sh "docker build -t comercio-agricola-backend:${tag} backend"
+          sh "docker build -t comercio-agricola-frontend:${tag} frontend"
+        }
+      }
+    }
+    stage('Deploy (by branch)') {
+      when { anyOf { branch 'DEV'; branch 'QA'; branch 'PROD' } }
+      steps {
+        script {
+          env.DEPLOY_ENV = env.BRANCH_NAME
+          sh "echo Desplegando a ${env.DEPLOY_ENV} (placeholder)"
+          // Sugerencia: usar SSH a servidor destino y ejecutar docker compose con perfiles
+          // sh "ssh user@host 'cd /opt/comercio && docker compose --profile ${env.DEPLOY_ENV} pull && docker compose --profile ${env.DEPLOY_ENV} up -d'"
+        }
+      }
+    }
+  }
+  post {
+    always {
+      archiveArtifacts artifacts: 'frontend/dist/**/*', allowEmptyArchive: true
+    }
+  }
+}

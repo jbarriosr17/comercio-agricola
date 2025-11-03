@@ -1,0 +1,20 @@
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# Node
+node_modules/
+dist/
+
+# OS/files
+.DS_Store
+
+# Coverage/Reports
+.coverage
+htmlcov/
+
+# Docker
+*.log
